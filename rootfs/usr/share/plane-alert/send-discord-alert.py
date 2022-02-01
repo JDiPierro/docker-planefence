@@ -108,11 +108,8 @@ def process_alerts(config, alerts):
         if dbinfo.get('tag3', "") != "":
             pf.discord.field(embed, "Tag", dbinfo['tag3'])
 
-        if dbinfo.get('link', "") != "":
-            pf.discord.field(embed, "Link", f"[Learn More]({dbinfo['link']})")
-
         # Send the message
-        webhook.execute()
+        pf.send(webhook, config)
 
 
 def main():

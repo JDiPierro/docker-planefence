@@ -85,7 +85,7 @@ def process_alert(config, plane):
     pf.discord.field(embed, "First Seen", f"{time_seen} {pf.get_timezone_str()}")
 
     # Send the message
-    webhook.execute()
+    pf.send(webhook, config)
 
 
 def main():
