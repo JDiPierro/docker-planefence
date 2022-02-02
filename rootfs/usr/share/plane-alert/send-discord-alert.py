@@ -29,6 +29,7 @@ import sys
 import csv
 
 import pflib as pf
+from geopy.geocoders import Nominatim
 
 
 # Read the alerts in the input file
@@ -59,6 +60,16 @@ def load_alerts(alerts_file):
     pf.log(f"Loaded {len(alerts)} alerts")
     return alerts
 
+def get_readable_location(plane):
+    geolocator = Nominatim(user_agent="kx1t/planefence")
+    loc = geolocator.reverse(f"{plane['lat']}, {plane['long']}")
+
+    adr = loc.raw.get('address', {})
+    town = adr.get('town', "")
+    city = adr.get('city', "")
+    state = adr.get('state', "")
+    country = adr.get('country_code', "").upper()
+    return f"{city or town}, {state}, {country}"
 
 def process_alerts(config, alerts):
     for plane in alerts:
@@ -78,6 +89,7 @@ def process_alerts(config, alerts):
         description = f""
         if plane.get('owner', "") != "":
             description = f"Operated by **{plane.get('owner')}**"
+        description += f"\nSeen near **{get_readable_location(plane)}**"
         description += f"\n[Track on ADS-B Exchange]({plane['adsbx_url']})"
 
         webhook, embed = pf.discord.build(config["PA_DISCORD_WEBHOOKS"], title, description, color=color)
